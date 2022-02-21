@@ -1,0 +1,5 @@
+{
+  "extends": ["config:base", ":pinVersions", ":pinAllExceptPeerDependencies"],
+  "groupName": "all",
+  "ignoreDeps": ["ava"]
+}

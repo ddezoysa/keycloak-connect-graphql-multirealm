@@ -1,0 +1,14 @@
+# Node.js stuff
+node_modules
+package-lock.json
+
+# Typescript Stuff
+dist
+*.tsbuildinfo
+
+# Build stuff
+coverage
+.nyc_output
+.vscode
+yarn.lock
+.git-original
