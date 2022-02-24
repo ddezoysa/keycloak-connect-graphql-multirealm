@@ -1,6 +1,6 @@
 {
   "name": "keycloak-connect-graphql-multirealm",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "Add Keycloak authentication and authorization to your GraphQL server.",
   "keywords": [
     "graphql",
@@ -50,7 +50,6 @@
     "coveralls": "3.1.0",
     "express": "4.17.1",
     "express-session": "1.17.1",
-    "graphql": "15.4.0",
     "graphql-subscriptions": "1.2.1",
     "keycloak-request-token": "0.1.0",
     "keycloak-admin": "1.14.4",

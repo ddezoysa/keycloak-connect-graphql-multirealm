@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # explicit declaration that this script needs a $TAG variable passed in e.g TAG=1.2.3 ./script.sh
-TAG=$TAG
+TAG=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
 
 RELEASE_SYNTAX='^[0-9]+\.[0-9]+\.[0-9]+$'
 PRERELEASE_SYNTAX='^[0-9]+\.[0-9]+\.[0-9]+(-.+)+$'

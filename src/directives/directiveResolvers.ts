@@ -173,7 +173,6 @@ export const hasPermission =
       error.code = 'UNAUTHENTICATED';
       throw error;
     }
-    console.log(permissions);
     if (!(await context.kauth.hasPermission(permissions))) {
       const error: any = new Error(
         `User is not authorized. Must have the following permissions: [${permissions}]`

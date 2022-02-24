@@ -90,7 +90,7 @@ export class KeycloakContextBase implements AuthContextProvider {
       return false;
     }
 
-    return await this.permissionsHandler.hasPermission(expectedPermissions);
+    return this.permissionsHandler.hasPermission(expectedPermissions);
   }
 
   public tenant(tenantName: string): boolean {

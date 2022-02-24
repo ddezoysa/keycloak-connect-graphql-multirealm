@@ -1,5 +1,4 @@
 import { KeycloakConfig, KeycloakOptions } from 'keycloak-connect';
-
 const Keycloak = require('keycloak-connect');
 const NodeCache = require('node-cache');
 const composable = require('composable-middleware');
@@ -52,7 +51,11 @@ export class KeycloakMultiRealm {
   constructor(
     config: KeycloakOptions,
     keycloakConfig: KeycloakConfig,
-    public realmTenantMappingFunction?: (tenantKey: string) => string
+    public realmTenantMappingFunction?: (tenantKey: string) => string,
+    public clientSecretResolverFunction?: (
+      realmName: string,
+      clientId: string
+    ) => string
   ) {
     if (!config) {
       throw new Error('Adapter configuration must be provided.');
@@ -149,11 +152,24 @@ export class KeycloakMultiRealm {
     if (keycloakObject) {
       return keycloakObject;
     }
-    const keycloakConfig = Object.assign({}, this.keycloakConfig, { realm });
-    console.log('keycloakConfig:');
-    console.log(keycloakConfig);
-    console.log('this.config: ');
-    console.log(this.config);
+
+    const additionalConfig: any = { realm };
+
+    if (this.clientSecretResolverFunction) {
+      additionalConfig.credentials = {
+        secret: this.clientSecretResolverFunction(
+          realm,
+          this.keycloakConfig.resource
+        ),
+      };
+    }
+
+    const keycloakConfig = Object.assign(
+      {},
+      this.keycloakConfig,
+      additionalConfig
+    );
+
     keycloakObject = new Keycloak(this.config, keycloakConfig);
     keycloakObject.authenticated = this.authenticated;
     keycloakObject.deauthenticated = this.deauthenticated;
