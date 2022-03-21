@@ -11,7 +11,7 @@ export class MultiRealmKeycloakContext
 {
   public readonly request: GrantedRequest;
   public readonly accessToken: Keycloak.Token | undefined;
-
+  private readonly authKey: string | undefined;
   token: any;
 
   constructor(
@@ -25,7 +25,17 @@ export class MultiRealmKeycloakContext
       req && req.kauth && req.kauth.grant
         ? req.kauth.grant.access_token
         : undefined;
+
     super(token, keycloak, authorizationConfiguration, req);
     this.request = req;
+    this.authKey = keycloak?.getAuthKey();
+  }
+
+  public isKeyAuthenticated(): boolean {
+    if (this.authKey) {
+      return this.request.headers['x-auth-key'] == this.authKey;
+    } else {
+      return false;
+    }
   }
 }

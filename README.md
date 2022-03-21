@@ -99,6 +99,7 @@ export function getSchema() {
   });
 
   schema = authDirectiveTransformer(schema, 'auth');
+  schema = authKeyDirectiveTransformer(schema, 'authKey');
   schema = tenantDirectiveTransformer(schema, 'tenant');
   schema = hasRoleDirectiveTransformer(schema, 'hasRole');
   schema = hasPermissionDirectiveTransformer(schema, 'hasPermission');

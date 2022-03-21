@@ -15,6 +15,7 @@ export interface GrantedRequest extends Request {
 
 export const CONTEXT_KEY = 'kauth';
 export const TENANT_KEY = 'tenantKey';
+export const REQUEST_KEY = 'req';
 
 export class KeycloakContextBase implements AuthContextProvider {
   private readonly permissionsHandler: KeycloakPermissionsHandler | undefined;

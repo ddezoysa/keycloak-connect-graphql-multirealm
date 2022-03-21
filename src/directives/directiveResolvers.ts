@@ -1,4 +1,4 @@
-import { CONTEXT_KEY, TENANT_KEY } from '../KeycloakContext';
+import { CONTEXT_KEY, TENANT_KEY, REQUEST_KEY } from '../KeycloakContext';
 import { isAuthorizedByRole } from './utils';
 
 /**
@@ -51,6 +51,26 @@ export const auth =
     return next.apply(null, params);
   };
 
+export const authKey =
+  (next: Function) =>
+  (...params: any[]) => {
+    let context = params[2];
+    if (!context[CONTEXT_KEY] || !context[CONTEXT_KEY].isKeyAuthenticated()) {
+      const error: any = new Error(`Invalid X-Auth-Key`);
+      error.code = 'UNAUTHENTICATED';
+      throw error;
+    }
+    // if (
+    //   !context[REQUEST_KEY] ||
+    //   !context[REQUEST_KEY].headers['x-auth-key'] ||
+    //   context[REQUEST_KEY].headers['x-auth-key'] != process.env.AUTH_KEY
+    // ) {
+    //   const error: any = new Error(`Invalid X-Auth-Key`);
+    //   error.code = 'UNAUTHENTICATED';
+    //   throw error;
+    // }
+    return next.apply(null, params);
+  };
 /**
  *
  * @param roles - The role or array of roles you want to authorize the user against.

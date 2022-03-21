@@ -3,6 +3,7 @@ import { mapSchema, getDirectives, MapperKind } from '@graphql-tools/utils';
 
 import {
   auth as resolveAuth,
+  authKey as resolveAuthKey,
   hasRole as resolveHasRole,
   hasPermission as resolveHasPermission,
   tenant as resolveTenant,
@@ -18,6 +19,22 @@ export function authDirectiveTransformer(schema: any, directiveName = 'auth') {
       if (deprecatedDirective) {
         const { resolve = defaultFieldResolver } = fieldConfig;
         fieldConfig.resolve = resolveAuth(resolve);
+        return fieldConfig;
+      }
+    },
+  });
+}
+
+export function authKeyDirectiveTransformer(schema, directiveName = 'authKey') {
+  return mapSchema(schema, {
+    // Executes once for each object field definition in the schema
+    [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
+      const deprecatedDirective = getDirectives(schema, fieldConfig, [
+        directiveName,
+      ])?.authKey;
+      if (deprecatedDirective) {
+        const { resolve = defaultFieldResolver } = fieldConfig;
+        fieldConfig.resolve = resolveAuthKey(resolve);
         return fieldConfig;
       }
     },

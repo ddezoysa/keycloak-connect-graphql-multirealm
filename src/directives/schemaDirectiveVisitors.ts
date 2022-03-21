@@ -3,7 +3,13 @@ import {
   SchemaDirectiveVisitor,
   VisitableSchemaType,
 } from '@graphql-tools/utils';
-import { auth, hasPermission, hasRole, tenant } from './directiveResolvers';
+import {
+  auth,
+  authKey,
+  hasPermission,
+  hasRole,
+  tenant,
+} from './directiveResolvers';
 
 export class AuthDirective extends SchemaDirectiveVisitor {
   constructor(config: {
@@ -19,6 +25,23 @@ export class AuthDirective extends SchemaDirectiveVisitor {
   public visitFieldDefinition(field: any) {
     const { resolve = defaultFieldResolver } = field;
     field.resolve = auth(resolve);
+  }
+}
+
+export class AuthKeyDirective extends SchemaDirectiveVisitor {
+  constructor(config: {
+    name: string;
+    visitedType: VisitableSchemaType;
+    schema: GraphQLSchema;
+    args: {};
+    context: { [key: string]: any };
+  }) {
+    super(config);
+  }
+
+  public visitFieldDefinition(field: any) {
+    const { resolve = defaultFieldResolver } = field;
+    field.resolve = authKey(resolve);
   }
 }
 

@@ -1,3 +1,4 @@
+import { authKey } from './../directives/directiveResolvers';
 import { KeycloakConfig, KeycloakOptions } from 'keycloak-connect';
 const Keycloak = require('keycloak-connect');
 const NodeCache = require('node-cache');
@@ -48,8 +49,10 @@ export class KeycloakMultiRealm {
   keycloakConfig: KeycloakConfig;
   realmTenantMappingFn: (tenantKey: string) => string;
 
+  authKey: string | undefined = undefined;
+
   constructor(
-    config: KeycloakOptions,
+    config: KeycloakOptions & { authKey: string | undefined },
     keycloakConfig: KeycloakConfig,
     public realmTenantMappingFunction?: (tenantKey: string) => string,
     public clientSecretResolverFunction?: (
@@ -65,12 +68,22 @@ export class KeycloakMultiRealm {
     } else {
       this.realmTenantMappingFn = realmTenantMappingFunction;
     }
+    if (config.authKey) {
+      this.authKey = config.authKey;
+      delete config['authKey'];
+    }
+
     this.config = config;
+
     this.keycloakConfig = this._getKeycloakConfig(keycloakConfig);
   }
 
   public getKeycloakConfig(): KeycloakConfig {
     return this.keycloakConfig;
+  }
+
+  public getAuthKey(): string | undefined {
+    return this.authKey;
   }
 
   public middleware(customOptions?: { admin?: string; logout?: string }) {

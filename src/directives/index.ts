@@ -1,6 +1,7 @@
 import {
   HasRoleDirective,
   AuthDirective,
+  AuthKeyDirective,
   HasPermissionDirective,
   TenantDirective,
 } from './schemaDirectiveVisitors';
@@ -38,6 +39,7 @@ export type SchemaDirectiveMap = Record<string, any>;
  */
 export const KeycloakSchemaDirectives: SchemaDirectiveMap = {
   auth: AuthDirective,
+  authKey: AuthKeyDirective,
   hasRole: HasRoleDirective,
   hasPermission: HasPermissionDirective,
   tenant: TenantDirective,
