@@ -29,6 +29,7 @@ export class MultiRealmKeycloakContext
     super(token, keycloak, authorizationConfiguration, req);
     this.request = req;
     this.authKey = keycloak?.getAuthKey();
+    this.token = token;
   }
 
   public isKeyAuthenticated(): boolean {
