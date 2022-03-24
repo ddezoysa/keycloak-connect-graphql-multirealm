@@ -36,6 +36,7 @@ npm install --save  graphql keycloak-connect apollo-server-express
   const keycloak = new KeycloakMultiRealm(
     {
       store: memoryStore,
+      authKey: "my-auth-key-for-static-key-auth",
     },
     keycloakClientConfig as any
   );
