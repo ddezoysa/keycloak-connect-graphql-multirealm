@@ -63,7 +63,7 @@
     "keycloak-connect": "11.x"
   },
   "peerDependencies": {
-    "graphql": "^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0",
+    "graphql": "^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0",
     "keycloak-connect": ">=9.0.0"
   },
   "nyc": {
