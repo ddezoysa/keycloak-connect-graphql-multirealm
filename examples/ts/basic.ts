@@ -1,12 +1,23 @@
-import express from 'express'
-import { ApolloServer, gql } from 'apollo-server-express'
-import { configureKeycloak } from '../lib/common'
-import cors from "cors"
+import { buildSubgraphSchema } from '@apollo/federation';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { mergeTypeDefs } from '@graphql-tools/merge';
+import cors from "cors";
+import express from 'express';
+import gql from 'graphql-tag';
 import {
   KeycloakContext,
-  KeycloakTypeDefs,
-  KeycloakSchemaDirectives
-} from '../../dist/index'
+  KeycloakTypeDefs
+} from '../../dist/index';
+import {
+  AuthDirective,
+  AuthKeyDirective,
+  HasPermissionDirective,
+  HasRoleDirective,
+  TenantDirective,
+} from '../../src/directives/schemaDirectiveVisitors';
+import { configureKeycloak } from '../lib/common';
+const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 
 const app = express()
 
@@ -23,7 +34,6 @@ const typeDefs = `
     hello: String @hasRole(role: "developer")
   }
 `
-
 const resolvers = {
   Query: {
     hello: (obj, args, context, info) => {
@@ -37,22 +47,62 @@ const resolvers = {
   }
 }
 
-const server = new ApolloServer({
-  typeDefs: [KeycloakTypeDefs, typeDefs],
-  // See  https://github.com/ardatan/graphql-tools/issues/1581
-  schemaDirectives: KeycloakSchemaDirectives,
-  resolvers,
-  context: ({ req }) => {
-    return {
-      kauth: new KeycloakContext({ req : req as any })
+export interface IContext {
+  kauth: KeycloakContext;
+}
+
+function convertToGraphQLResolverMap(iResolvers) {
+  const graphQLResolvers = {};
+  for (const type of Object.keys(iResolvers)) {
+    graphQLResolvers[type] = {};
+    for (const field of Object.keys(iResolvers[type])) {
+      const resolverFunction = iResolvers[type][field];
+      graphQLResolvers[type][field] = resolverFunction;
     }
   }
-})
+  return graphQLResolvers;
+}
 
-server.applyMiddleware({ app })
+export function getSchema() {
 
-const port = 4000
+  let schema = buildSubgraphSchema([{ typeDefs: mergeTypeDefs([constraintDirectiveTypeDefs, typeDefs, gql(KeycloakTypeDefs)]), resolvers: convertToGraphQLResolverMap(resolvers) }]);
+  schema = AuthDirective(schema, 'auth');
+  schema = AuthKeyDirective(schema, 'authKey');
+  schema = TenantDirective(schema, 'tenant');
+  schema = HasRoleDirective(schema, 'hasRole');
+  schema = HasPermissionDirective(schema, 'hasPermission');
+  schema = constraintDirective()(schema);
 
-app.listen({ port }, () =>
-  console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`)
-)
+  return schema;
+}
+
+export async function startApolloServer() {
+  const server = new ApolloServer<IContext>({
+    schema: getSchema(),
+    csrfPrevention: false,
+    //TODO: Remove includeStacktraceInErrorResponses config after development
+    includeStacktraceInErrorResponses: true,
+  })
+
+
+  app.use(
+    graphqlPath,
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        return {
+          kauth: new KeycloakContext({ req: req as any })
+        } as IContext
+      }
+    })
+
+  )
+
+  const port = 4000
+  app.listen({ port }, () =>
+    console.log(`🚀 Server ready at http://localhost:${port}${graphqlPath}`)
+  )
+}
+
+startApolloServer();
+
+
