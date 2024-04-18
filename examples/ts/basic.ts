@@ -1,6 +1,6 @@
-import { buildSubgraphSchema } from '@apollo/federation';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import cors from "cors";
 import express from 'express';
